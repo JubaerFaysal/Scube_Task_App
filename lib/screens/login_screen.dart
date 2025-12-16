@@ -27,6 +27,9 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
+    double widthScale = screenWidth / 360;
+    double heightScale = screenHeight / 800;
     return Scaffold(
       backgroundColor: const Color(0xFF0096FC),
       body: Stack(
@@ -35,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Positioned(
             left: 0,
             right: 0,
-            top: 336,
+            top: screenHeight * (336 / 800),
             child: Container(
               width: screenWidth,
               height: screenHeight - 336,
@@ -51,20 +54,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
           /// Logo
           Positioned(
-            top: 80,
+            top: screenHeight * (80 / 800),
             left: 0,
             right: 0,
             child: Center(
               child: Container(
-                width: 96,
-                height: 98,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: Image.asset(
-                  "assets/img.png",
-                  fit: BoxFit.cover,
-                ),
+                width: 96* widthScale,
+                height: 98*heightScale,
+                decoration: const BoxDecoration(shape: BoxShape.circle),
+                child: Image.asset("assets/img.png", fit: BoxFit.cover),
               ),
             ),
           ),
@@ -73,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Positioned(
             left: 0,
             right: 0,
-            top: 198,
+            top: screenHeight * (198 / 800),
             child: RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
@@ -81,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextSpan(
                     text: "SCUBE\n",
                     style: GoogleFonts.inter(
-                      fontSize: 24,
+                      fontSize: 24*widthScale,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                       height: 1.0,
@@ -90,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextSpan(
                     text: "Control & Monitoring System",
                     style: GoogleFonts.inter(
-                      fontSize: 20,
+                      fontSize: 20*widthScale,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                       height: 28 / 20,
@@ -105,15 +103,16 @@ class _LoginScreenState extends State<LoginScreen> {
           Positioned(
             left: 0,
             right: 0,
-            top: 368,
+            top: screenHeight * (368 / 800),
             child: Center(
               child: Text(
                 'Login',
                 style: GoogleFonts.inter(
                   fontStyle: FontStyle.normal,
                   fontWeight: FontWeight.w700,
-                  fontSize: 24,
+                  fontSize: 24*widthScale,
                   height: 1.5,
+                  letterSpacing: 0,
                   color: Color(0xFF082438),
                 ),
               ),
@@ -124,10 +123,10 @@ class _LoginScreenState extends State<LoginScreen> {
           Positioned(
             left: 12,
             right: 12,
-            top: 428,
+            top: screenHeight * (428 / 800),
             child: Container(
               width: screenWidth,
-              height: 56,
+              height: 56*heightScale,
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(color: const Color(0xFFB9C6D6), width: 1),
@@ -144,32 +143,36 @@ class _LoginScreenState extends State<LoginScreen> {
           Positioned(
             left: 12,
             right: 12,
-            top: 496,
+            top: screenHeight * (496 / 800),
             child: Container(
               width: screenWidth,
-              height: 56,
+              height: 56*heightScale,
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(color: const Color(0xFFB9C6D6), width: 1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: CustomTextField(hintText: "Password", controller: password,isPassword: true,)
+              child: CustomTextField(
+                hintText: "Password",
+                controller: password,
+                isPassword: true,
+              ),
             ),
           ),
 
           /// Forget password
           Positioned(
             right: 12,
-            top: 560,
+            top: screenHeight * (560 / 800),
             child: GestureDetector(
               onTap: () {},
-              child: const Text(
+              child:  Text(
                 'Forget password?',
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontStyle: FontStyle.normal,
                   fontWeight: FontWeight.w500,
-                  fontSize: 12,
+                  fontSize: 12* widthScale,
                   height: 15 / 12,
                   decoration: TextDecoration.underline,
                   color: Color(0xFF5E5E5E),
@@ -181,27 +184,30 @@ class _LoginScreenState extends State<LoginScreen> {
           /// Login button
           Positioned(
             left: 12,
-            top: 595,
+            top: screenHeight * (595 / 800),
             right: 12,
             child: GestureDetector(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>DashboardScreen()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DashboardScreen()),
+                );
               },
               child: Container(
                 width: screenWidth,
-                height: 60,
+                height: 60*heightScale,
                 decoration: BoxDecoration(
                   color: const Color(0xFF0096FC),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Center(
+                child:  Center(
                   child: Text(
                     'Login',
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontStyle: FontStyle.normal,
                       fontWeight: FontWeight.w600,
-                      fontSize: 18,
+                      fontSize: 18*widthScale,
                       height: 22 / 18,
                       color: Colors.white,
                     ),
@@ -215,34 +221,34 @@ class _LoginScreenState extends State<LoginScreen> {
           Positioned(
             left: 0,
             right: 0,
-            top: 663,
+            top: screenHeight * (663 / 800),
             child: RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
                 children: [
-                  const TextSpan(
+                  TextSpan(
                     text: "Don't have any account? ",
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
+                    style: GoogleFonts.inter(
                       fontStyle: FontStyle.normal,
                       fontWeight: FontWeight.w500,
-                      fontSize: 12,
+                      fontSize: 12*widthScale,
                       height: 15 / 12,
-                      color: Color(0xFF5E5E5E),
+                      color: const Color(0xFF5E5E5E),
                     ),
                   ),
                   WidgetSpan(
                     child: GestureDetector(
-                      onTap: () {},
-                      child: const Text(
+                      onTap: () {
+                        // Handle register navigation
+                      },
+                      child: Text(
                         'Register Now',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
+                        style: GoogleFonts.inter(
                           fontStyle: FontStyle.normal,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14*widthScale,
                           height: 15 / 12,
-                          color: Color(0xFF0096FC),
+                          color: const Color(0xFF0096FC),
                         ),
                       ),
                     ),

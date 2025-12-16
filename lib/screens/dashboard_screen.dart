@@ -11,7 +11,6 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedTab = 0;
   bool _isSourceSelected = true;
-  final ScrollController _scrollController = ScrollController();
   final List<String> _tabTitles = ['Summary', 'SLD', 'Data'];
   final List<DataModel> solarData = [
     DataModel(label: 'Data 1', value: '55505.63'),
@@ -22,12 +21,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     DataModel(label: 'Live Power', value: '55505.63 kW'),
     DataModel(label: 'Today Energy', value: '58805.63 kWh'),
   ];
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -345,7 +338,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Stack(
         children: [
           ListView(
-            controller: _scrollController,
             padding: EdgeInsets.zero,
             children: [
               _buildDataItem(

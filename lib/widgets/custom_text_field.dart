@@ -29,8 +29,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    double widthScale = screenWidth / 360;
+    double heightScale = screenHeight / 800;
     return Container(
-      height: 56,
+      height: 56*heightScale,
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: const Color(0xFFB9C6D6), width: 1),
@@ -42,19 +47,19 @@ class _CustomTextFieldState extends State<CustomTextField> {
         decoration: InputDecoration(
           hintText: widget.hintText,
           hintStyle: GoogleFonts.inter(
-            fontSize: 14,
+            fontSize: 14*widthScale,
             fontWeight: FontWeight.w400,
             height: 17 / 14,
             color: const Color(0xFF5E5E5E),
           ),
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12*widthScale, vertical: 20*heightScale),
           suffixIcon: widget.isPassword
               ? IconButton(
             icon: Icon(
               obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
               color: const Color(0xFF82797A),
-              size: 18,
+              size: 18*widthScale,
             ),
             onPressed: () {
               setState(() {
@@ -65,7 +70,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               : null,
         ),
         style: GoogleFonts.inter(
-          fontSize: 14,
+          fontSize: 14*widthScale,
           color: const Color(0xFF082438),
         ),
       ),
