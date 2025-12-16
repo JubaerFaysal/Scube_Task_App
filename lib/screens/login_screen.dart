@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:scube_task_app/screens/dashboard_screen.dart';
 
 import '../widgets/custom_text_field.dart';
 
@@ -184,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
             right: 12,
             child: GestureDetector(
               onTap: () {
-                // Handle login
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>DashboardScreen()));
               },
               child: Container(
                 width: screenWidth,
