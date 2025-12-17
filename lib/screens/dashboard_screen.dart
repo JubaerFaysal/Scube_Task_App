@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scube_task_app/model/data_model.dart';
+import 'package:scube_task_app/screens/empty_screen.dart';
+import 'package:scube_task_app/screens/energy_data_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -11,6 +13,8 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedTab = 0;
   bool _isSourceSelected = true;
+  final ScrollController _scrollController = ScrollController();
+
   final List<String> _tabTitles = ['Summary', 'SLD', 'Data'];
   final List<DataModel> solarData = [
     DataModel(label: 'Data 1', value: '55505.63'),
@@ -21,6 +25,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     DataModel(label: 'Live Power', value: '55505.63 kW'),
     DataModel(label: 'Today Energy', value: '58805.63 kWh'),
   ];
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +98,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   SizedBox(height: 12 * heightScale),
                   // Main Card with Tabs
-                  _buildMainCard(
+                  buildMainCard(
                     screenWidth,
                     screenHeight,
                     widthScale,
@@ -110,7 +120,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildMainCard(
+  Widget buildMainCard(
     double screenWidth,
     double screenHeight,
     double widthScale,
@@ -284,7 +294,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SizedBox(height: 6),
 
         // Scrollable Data List
-        _buildDataList(cardWidth, widthScale),
+        _buildDataList( widthScale),
       ],
     );
   }
@@ -331,104 +341,126 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildDataList(double cardWidth, double widthScale) {
+  Widget _buildDataList(double widthScale) {
     return SizedBox(
-      width: 288 * widthScale,
+      width: 290 * widthScale,
       height: 229,
       child: Stack(
         children: [
-          ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              _buildDataItem(
-                'Data View',
-                'Active',
-                true,
-                'assets/solar.png',
-                solarData,
-                const Color(0xFF78C6FF),
-                const Color(0xFFE5F4FE),
-              ),
-              const SizedBox(height: 8),
-              _buildDataItem(
-                'Data Type 2',
-                'Active',
-                true,
-                'assets/bettery.png',
-                solarData,
-                const Color(0xFFFB902E),
-                const Color(0xFFE5F4FE),
-              ),
-              const SizedBox(height: 8),
-              _buildDataItem(
-                'Data Type 3',
-                'Inactive',
-                false,
-                'assets/tower.png',
-                solarData,
-                const Color(0xFF78C6FF),
-                const Color(0xFFE5F4FE),
-              ),
-              const SizedBox(height: 8),
-              _buildDataItem(
-                'Total Solar',
-                'Active',
-                true,
-                'assets/solar.png',
-                powerData,
-                const Color(0xFF78C6FF),
-                const Color(0xFFF0F1FF),
-              ),
-            ],
+          Positioned(
+            left: 0,
+            top: 0,
+            right: 10,
+            bottom: 0,
+            child: ListView(
+              controller: _scrollController,
+              padding: EdgeInsets.zero,
+              children: [
+                buildDataItem('Data View',
+                    'Active',
+                    true,
+                    'assets/solar.png',
+                    solarData,
+                    const Color(0xFF78C6FF),
+                    const Color(0xFFE5F4FE),
+                  () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const EnergyDashboard(),
+                      ),
+                    );
+                  },),
+                const SizedBox(height: 8),
+                buildDataItem(
+                  'Data Type 2',
+                  'Active',
+                  true,
+                  'assets/bettery.png',
+                  solarData,
+                  const Color(0xFFFB902E),
+                  const Color(0xFFE5F4FE),
+                  (){},
+                ),
+                const SizedBox(height: 8),
+                buildDataItem(
+                  'Data Type 3',
+                  'Inactive',
+                  false,
+                  'assets/tower.png',
+                  solarData,
+                  const Color(0xFF78C6FF),
+                  const Color(0xFFE5F4FE),
+                        (){}
+                ),
+                const SizedBox(height: 8),
+                buildDataItem(
+                  'Total Solar',
+                  'Active',
+                  true,
+                  'assets/solar.png',
+                  powerData,
+                  const Color(0xFF78C6FF),
+                  const Color(0xFFF0F1FF),
+                        (){}
+                ),
+              ],
+            ),
           ),
 
-          // Gradient overlay at bottom
+          // Gradient overlay at bottom - align with content
           Positioned(
             bottom: 0,
             left: 0,
-            right: 0,
-            child: Container(
-              height: 28,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: [
-                    const Color(0xFF19416E).withOpacity(0.6),
-                    Colors.transparent,
-                  ],
+            right: 8,
+            child: IgnorePointer(
+              child: Container(
+                height: 28,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      const Color(0xFF19416E).withOpacity(0.6),
+                      Colors.transparent,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(3),
                 ),
-                borderRadius: BorderRadius.circular(3),
               ),
             ),
           ),
 
-          // Custom scrollbar
+          // Custom scrollbar - full height on right
           Positioned(
             right: 0,
-            top: 38,
+            top: 10,
+            bottom: 10,
             child: Container(
               width: 4,
-              height: 187,
               decoration: BoxDecoration(
                 color: const Color(0xFFB6B8D0),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: Container(
-                  width: 4,
-                  height: 33,
-                  margin: const EdgeInsets.only(top: 11),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0xFF4E91FD), Color(0xFF080B7F)],
+              child: Stack(
+                children: [
+                  // Scrollbar thumb
+                  Positioned(
+                    top: 11,
+                    child: Container(
+                      width: 4,
+                      height: 33,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFF4E91FD), Color(0xFF080B7F)],
+                        ),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(4),
                   ),
-                ),
+                ],
               ),
             ),
           ),
@@ -437,7 +469,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildDataItem(
+
+  Widget buildDataItem(
     String title,
     String status,
     bool isActive,
@@ -445,114 +478,119 @@ class _DashboardScreenState extends State<DashboardScreen> {
     List<DataModel> dataPoints,
     Color indicatorColor,
     Color bgColor,
-  ) {
-    return Container(
-      height: 71,
-      decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: const Color(0xFFA5A7B9), width: 1),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Row(
-        children: [
-          // Icon
-          SizedBox(
-            width: 24,
-            height: 24,
-            child: Image.asset(iconPath, fit: BoxFit.cover),
-          ),
+      VoidCallback? onTap,
 
-          const SizedBox(width: 14),
-
-          // Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              // mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Title row
-                Row(
-                  children: [
-                    Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: indicatorColor,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                        height: 17 / 14,
-                        color: Color(0xFF04063E),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '($status)',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 10,
-                        height: 12 / 10,
-                        color: isActive
-                            ? const Color(0xFF0096FC)
-                            : const Color(0xFFDF2222),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                // Data points
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: dataPoints.map((data) {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Row(
-                        children: [
-                          // Label
-                          Text(
-                            data.label,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 12,
-                              height: 15 / 12,
-                              color: Color(0xFF646984), // grey
-                            ),
-                          ),
-                          const SizedBox(width: 18,),
-                          // Value
-                          Text(
-                            ': ${data.value}',
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12,
-                              height: 15 / 12,
-                              color: Color(0xFF04063E), // black
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
-
-              ],
+      ) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        height: 71,
+        decoration: BoxDecoration(
+          color: bgColor,
+          border: Border.all(color: const Color(0xFFA5A7B9), width: 1),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          children: [
+            // Icon
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: Image.asset(iconPath, fit: BoxFit.cover),
             ),
-          ),
 
-          // Arrow
-          const Icon(Icons.chevron_right, color: Color(0xFF646984), size: 24),
-        ],
+            const SizedBox(width: 14),
+
+            // Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                // mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Title row
+                  Row(
+                    children: [
+                      Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: indicatorColor,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                          height: 17 / 14,
+                          color: Color(0xFF04063E),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '($status)',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 10,
+                          height: 12 / 10,
+                          color: isActive
+                              ? const Color(0xFF0096FC)
+                              : const Color(0xFFDF2222),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  // Data points
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: dataPoints.map((data) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Row(
+                          children: [
+                            // Label
+                            Text(
+                              data.label,
+                              style: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12,
+                                height: 15 / 12,
+                                color: Color(0xFF646984), // grey
+                              ),
+                            ),
+                            const SizedBox(width: 18,),
+                            // Value
+                            Text(
+                              ': ${data.value}',
+                              style: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
+                                height: 15 / 12,
+                                color: Color(0xFF04063E), // black
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+
+                ],
+              ),
+            ),
+
+            // Arrow
+            const Icon(Icons.chevron_right, color: Color(0xFF646984), size: 24),
+          ],
+        ),
       ),
     );
   }
@@ -612,7 +650,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildGridItem(String title, String iconPath, double width) {
     return GestureDetector(
       onTap: () {
-        // Handle navigation
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>EmptyScreen()));
       },
       child: Container(
         width: width,
