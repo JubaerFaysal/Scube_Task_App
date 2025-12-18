@@ -41,8 +41,6 @@ This project demonstrates:
 <p align="center">
   <img src="screenshot/home.png" width="250" />
   <img src="screenshot/empty.png" width="250" />
-  <img src="screenshot/h2.png" width="250" />
-  <img src="screenshot/h3.png" width="250" />
   <img src="screenshot/h4.png" width="250" />
   <img src="screenshot/h5.png" width="250" />
   <img src="screenshot/h6.png" width="250" />
