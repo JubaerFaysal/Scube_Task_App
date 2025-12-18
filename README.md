@@ -40,12 +40,12 @@ This project demonstrates:
 
 ![Home Screen](screenshot/home.png)
 ![Empty State](screenshot/empty.png)
-![Dashboard](screenshots/h2.png)
-![Dashboard](screenshots/h3.png)
-![Dashboard](screenshots/h4.png)
-![Dashboard](screenshots/h5.png)
-![Dashboard](screenshots/h6.png)
-![Dashboard](screenshots/h7.png)
+![Dashboard](screenshot/h2.png)
+![Dashboard](screenshot/h3.png)
+![Dashboard](screenshot/h4.png)
+![Dashboard](screenshot/h5.png)
+![Dashboard](screenshot/h6.png)
+![Dashboard](screenshot/h7.png)
 
 
 
