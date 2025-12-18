@@ -38,14 +38,17 @@ This project demonstrates:
 
 ## 📸 Screenshots
 
-![Home Screen](screenshot/home.png)
-![Empty State](screenshot/empty.png)
-![Dashboard](screenshot/h2.png)
-![Dashboard](screenshot/h3.png)
-![Dashboard](screenshot/h4.png)
-![Dashboard](screenshot/h5.png)
-![Dashboard](screenshot/h6.png)
-![Dashboard](screenshot/h7.png)
+<p align="center">
+  <img src="screenshot/home.png" width="250" />
+  <img src="screenshot/empty.png" width="250" />
+  <img src="screenshot/h2.png" width="250" />
+  <img src="screenshot/h3.png" width="250" />
+  <img src="screenshot/h4.png" width="250" />
+  <img src="screenshot/h5.png" width="250" />
+  <img src="screenshot/h6.png" width="250" />
+  <img src="screenshot/h7.png" width="250" />
+</p>
+
 
 
 
