@@ -1,131 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:scube_task_app/controllers/dashboard_controller.dart';
 import 'package:scube_task_app/model/data_model.dart';
 import 'package:scube_task_app/screens/empty_screen.dart';
-import 'package:scube_task_app/screens/energy_data_screen.dart';
+import 'package:scube_task_app/screens/energy_data_screen/energy_data_screen.dart';
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
 
-  @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
-}
+class DashboardWidgets {
+  final DashboardController controller;
 
-class _DashboardScreenState extends State<DashboardScreen> {
-  int _selectedTab = 0;
-  bool _isSourceSelected = true;
-  final ScrollController _scrollController = ScrollController();
+  DashboardWidgets(this.controller);
 
-  final List<String> _tabTitles = ['Summary', 'SLD', 'Data'];
-  final List<DataModel> solarData = [
-    DataModel(label: 'Data 1', value: '55505.63'),
-    DataModel(label: 'Data 2', value: '58805.63'),
-  ];
-
-  final List<DataModel> powerData = [
-    DataModel(label: 'Live Power', value: '55505.63 kW'),
-    DataModel(label: 'Today Energy', value: '58805.63 kWh'),
-  ];
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
-    double widthScale = screenWidth / 360;
-    double heightScale = screenHeight / 836;
-
-    int _selectedTab = 0;
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFD9E4F1),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF04063E)),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: Text(
-          "SCM",
-          // style: TextStyle(
-          //   fontFamily: 'Inter',
-          //   fontWeight: FontWeight.w500,
-          //   fontSize: 16,
-          //   height: 24 / 16,
-          //   color: Color(0xFF04063E),
-          // ),
-        ),
-        centerTitle: true,
-        actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.notifications_outlined,
-                  color: Color(0xFF646984),
-                ),
-                onPressed: () {},
-              ),
-              Positioned(
-                right: 15,
-                top: 12,
-
-                child: Container(
-                  width: 9,
-                  height: 9,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFDF2222),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  SizedBox(height: 12 * heightScale),
-                  // Main Card with Tabs
-                  buildMainCard(
-                    screenWidth,
-                    screenHeight,
-                    widthScale,
-                    heightScale,
-                  ),
-
-                  SizedBox(height: 20 * heightScale),
-
-                  // Bottom Grid Buttons
-                  _buildBottomGrid(screenWidth, widthScale),
-
-                  SizedBox(height: 20 * heightScale),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildMainCard(
-    double screenWidth,
-    double screenHeight,
-    double widthScale,
-    double heightScale,
-  ) {
+  Widget mainCard(
+      double screenWidth,
+      double screenHeight,
+      double widthScale,
+      double heightScale,
+      ) {
     double cardWidth = 312 * widthScale;
 
     return Container(
@@ -137,16 +28,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       child: Column(
         children: [
-          // Tabs
-          _buildTabs(),
-
-          _buildSummaryContent(cardWidth, widthScale, heightScale),
+          tabs(),
+          summaryContent(cardWidth, widthScale, heightScale),
         ],
       ),
     );
   }
 
-  Widget _buildTabs() {
+  Widget tabs() {
     return Container(
       height: 39,
       decoration: BoxDecoration(
@@ -157,35 +46,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
           topRight: Radius.circular(11),
         ),
       ),
-      child: Row(
+      child: Obx(() => Row(
         children: List.generate(3, (index) {
           return Expanded(
             child: GestureDetector(
-              onTap: () => setState(() => _selectedTab = index),
+              onTap: () => controller.changeTab(index),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: _selectedTab == index
+                  color: controller.selectedTab.value == index
                       ? const Color(0xFF0096FC)
                       : Colors.transparent,
-                  borderRadius: _selectedTab == index
+                  borderRadius: controller.selectedTab.value == index
                       ? const BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
-                        )
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  )
                       : BorderRadius.zero,
                 ),
                 child: Text(
-                  _tabTitles[index],
+                  controller.tabTitles[index],
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 14,
                     height: 17 / 14,
-                    fontWeight: _selectedTab == index
+                    fontWeight: controller.selectedTab.value == index
                         ? FontWeight.bold
                         : FontWeight.w400,
-                    color: _selectedTab == index
+                    color: controller.selectedTab.value == index
                         ? Colors.white
                         : const Color(0xFF646984),
                   ),
@@ -194,18 +83,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           );
         }),
-      ),
+      )),
     );
   }
 
-  Widget _buildSummaryContent(
-    double cardWidth,
-    double widthScale,
-    double heightScale,
-  ) {
+  Widget summaryContent(
+      double cardWidth,
+      double widthScale,
+      double heightScale,
+      ) {
     return Column(
       children: [
-        // Electricity Section Header
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Column(
@@ -228,14 +116,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           ),
         ),
-
-        // Circular Progress - Total Power
         SizedBox(
           height: 164,
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Circle
               SizedBox(
                 width: 150,
                 height: 150,
@@ -243,13 +128,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   value: 100,
                   strokeWidth: 20,
                   backgroundColor: Colors.grey[300],
-                  valueColor: const AlwaysStoppedAnimation<Color>(
-                    Color(0xFF398FC9),
-                  ),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF398FC9)),
                 ),
               ),
-
-              // Center text
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
@@ -279,28 +160,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           ),
         ),
-
         const SizedBox(height: 16),
-
-        // Source / Load Toggle
-        buildSourceLoadToggle(widthScale),
-
-        // Divider
+        sourceLoadToggle(widthScale),
         SizedBox(
           width: 288 * widthScale,
           child: const Divider(thickness: 2, color: Color(0xFFA5A7B9)),
         ),
-
         const SizedBox(height: 6),
-
-        // Scrollable Data List
-        _buildDataList( widthScale),
+        dataList(widthScale),
       ],
     );
   }
 
-  Widget buildSourceLoadToggle(double widthScale) {
-    return Container(
+  Widget sourceLoadToggle(double widthScale) {
+    return Obx(() => Container(
       width: 288 * widthScale,
       height: 38,
       decoration: BoxDecoration(
@@ -308,17 +181,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
-        children: [_toggleItem('Source', true), _toggleItem('Load', false)],
+        children: [
+          toggleItem('Source', true, widthScale),
+          toggleItem('Load', false, widthScale),
+        ],
       ),
-    );
+    ));
   }
 
-  Widget _toggleItem(String text, bool isSource) {
-    final bool isSelected = _isSourceSelected == isSource;
+  Widget toggleItem(String text, bool isSource, double widthScale) {
+    final bool isSelected = controller.isSourceSelected.value == isSource;
 
     return Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => _isSourceSelected = isSource),
+        onTap: () => controller.toggleSource(isSource),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           alignment: Alignment.center,
@@ -341,7 +217,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildDataList(double widthScale) {
+  Widget dataList(double widthScale) {
     return SizedBox(
       width: 290 * widthScale,
       height: 229,
@@ -353,62 +229,55 @@ class _DashboardScreenState extends State<DashboardScreen> {
             right: 10,
             bottom: 0,
             child: ListView(
-              controller: _scrollController,
+              controller: controller.scrollController,
               padding: EdgeInsets.zero,
               children: [
-                buildDataItem('Data View',
-                    'Active',
-                    true,
-                    'assets/solar.png',
-                    solarData,
-                    const Color(0xFF78C6FF),
-                    const Color(0xFFE5F4FE),
-                  () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const EnergyDashboard(),
-                      ),
-                    );
-                  },),
+                dataItem(
+                  'Data View',
+                  'Active',
+                  true,
+                  'assets/solar.png',
+                  controller.solarData,
+                  const Color(0xFF78C6FF),
+                  const Color(0xFFE5F4FE),
+                      () => Get.to(() => EnergyDashboard()),
+                ),
                 const SizedBox(height: 8),
-                buildDataItem(
+                dataItem(
                   'Data Type 2',
                   'Active',
                   true,
                   'assets/bettery.png',
-                  solarData,
+                  controller.solarData,
                   const Color(0xFFFB902E),
                   const Color(0xFFE5F4FE),
-                  (){},
+                      () {},
                 ),
                 const SizedBox(height: 8),
-                buildDataItem(
+                dataItem(
                   'Data Type 3',
                   'Inactive',
                   false,
                   'assets/tower.png',
-                  solarData,
+                  controller.solarData,
                   const Color(0xFF78C6FF),
                   const Color(0xFFE5F4FE),
-                        (){}
+                      () {},
                 ),
                 const SizedBox(height: 8),
-                buildDataItem(
+                dataItem(
                   'Total Solar',
                   'Active',
                   true,
                   'assets/solar.png',
-                  powerData,
+                  controller.powerData,
                   const Color(0xFF78C6FF),
                   const Color(0xFFF0F1FF),
-                        (){}
+                      () {},
                 ),
               ],
             ),
           ),
-
-          // Gradient overlay at bottom - align with content
           Positioned(
             bottom: 0,
             left: 0,
@@ -430,8 +299,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
-
-          // Custom scrollbar - full height on right
           Positioned(
             right: 0,
             top: 10,
@@ -444,7 +311,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               child: Stack(
                 children: [
-                  // Scrollbar thumb
                   Positioned(
                     top: 11,
                     child: Container(
@@ -469,17 +335,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-
-  Widget buildDataItem(
-    String title,
-    String status,
-    bool isActive,
-    String iconPath,
-    List<DataModel> dataPoints,
-    Color indicatorColor,
-    Color bgColor,
+  Widget dataItem(
+      String title,
+      String status,
+      bool isActive,
+      String iconPath,
+      List<DataModel> dataPoints,
+      Color indicatorColor,
+      Color bgColor,
       VoidCallback? onTap,
-
       ) {
     return InkWell(
       onTap: onTap,
@@ -493,22 +357,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(
           children: [
-            // Icon
             SizedBox(
               width: 24,
               height: 24,
               child: Image.asset(iconPath, fit: BoxFit.cover),
             ),
-
             const SizedBox(width: 14),
-
-            // Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                // mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Title row
                   Row(
                     children: [
                       Container(
@@ -538,15 +396,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           fontWeight: FontWeight.w500,
                           fontSize: 10,
                           height: 12 / 10,
-                          color: isActive
-                              ? const Color(0xFF0096FC)
-                              : const Color(0xFFDF2222),
+                          color: isActive ? const Color(0xFF0096FC) : const Color(0xFFDF2222),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 2),
-                  // Data points
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: dataPoints.map((data) {
@@ -554,7 +409,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         padding: const EdgeInsets.only(top: 2),
                         child: Row(
                           children: [
-                            // Label
                             Text(
                               data.label,
                               style: const TextStyle(
@@ -562,11 +416,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 fontWeight: FontWeight.w400,
                                 fontSize: 12,
                                 height: 15 / 12,
-                                color: Color(0xFF646984), // grey
+                                color: Color(0xFF646984),
                               ),
                             ),
-                            const SizedBox(width: 18,),
-                            // Value
+                            const SizedBox(width: 18),
                             Text(
                               ': ${data.value}',
                               style: const TextStyle(
@@ -574,7 +427,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12,
                                 height: 15 / 12,
-                                color: Color(0xFF04063E), // black
+                                color: Color(0xFF04063E),
                               ),
                             ),
                           ],
@@ -582,12 +435,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       );
                     }).toList(),
                   ),
-
                 ],
               ),
             ),
-
-            // Arrow
             const Icon(Icons.chevron_right, color: Color(0xFF646984), size: 24),
           ],
         ),
@@ -595,7 +445,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildBottomGrid(double screenWidth, double widthScale) {
+  Widget buildBottomGrid(double screenWidth, double widthScale) {
     double cardWidth = 148 * widthScale;
     double spacing = 16 * widthScale;
 
@@ -606,40 +456,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildGridItem(
-                'Analysis Pro',
-                'assets/analysis.png',
-                cardWidth,
-              ),
-              _buildGridItem(
-                'G. Generator',
-                'assets/generator.png',
-                cardWidth,
-              ),
+              buildGridItem('Analysis Pro', 'assets/analysis.png', cardWidth),
+              buildGridItem('G. Generator', 'assets/generator.png', cardWidth),
             ],
           ),
           SizedBox(height: spacing),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildGridItem('Plant Summery', 'assets/plant.png', cardWidth),
-              _buildGridItem(
-                'Natural Gas',
-                'assets/gas.png',
-                cardWidth,
-              ),
+              buildGridItem('Plant Summery', 'assets/plant.png', cardWidth),
+              buildGridItem('Natural Gas', 'assets/gas.png', cardWidth),
             ],
           ),
           SizedBox(height: spacing),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildGridItem(
-                'D. Generator',
-                'assets/generator.png',
-                cardWidth,
-              ),
-              _buildGridItem('Water Process', 'assets/water.png', cardWidth),
+              buildGridItem('D. Generator', 'assets/generator.png', cardWidth),
+              buildGridItem('Water Process', 'assets/water.png', cardWidth),
             ],
           ),
         ],
@@ -647,11 +481,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildGridItem(String title, String iconPath, double width) {
+  Widget buildGridItem(String title, String iconPath, double width) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>EmptyScreen()));
-      },
+      onTap: () => Get.to(() => EmptyScreen()),
       child: Container(
         width: width,
         height: 42,
@@ -663,11 +495,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Row(
           children: [
-          SizedBox(
-          width: 24,
-          height: 24,
-          child: Image.asset(iconPath, fit: BoxFit.cover),
-        ),
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: Image.asset(iconPath, fit: BoxFit.cover),
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(

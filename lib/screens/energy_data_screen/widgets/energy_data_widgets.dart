@@ -1,141 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'dart:math' as math;
 
-class EnergyDashboard extends StatefulWidget {
-  const EnergyDashboard({super.key});
+import 'package:scube_task_app/controllers/energy_dashboard_controller.dart';
 
-  @override
-  State<EnergyDashboard> createState() => _EnergyDashboardState();
-}
+class EnergyDataWidgets {
+  final EnergyDashboardController controller;
 
-class _EnergyDashboardState extends State<EnergyDashboard> {
-  bool isDataView = true;
-  bool isTodayData = true;
-  bool isExpanded = true;
-  DateTime? fromDate;
-  DateTime? toDate;
+  EnergyDataWidgets(this.controller);
 
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFD9E4F1),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 4,
-        shadowColor: Colors.black.withOpacity(0.05),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF04063E)),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: const Text(
-          "SCM",
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w500,
-            fontSize: 16,
-            color: Color(0xFF04063E),
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.notifications_outlined,
-                  color: Color(0xFF646984),
-                  size: 20,
-                ),
-                onPressed: () {},
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  width: 9,
-                  height: 9,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFDF2222),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          // Full-screen background container
-          Positioned.fill(
-            top: 40,
-            child: Container(
-              height: screenHeight,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: const Color(0xFFA5A7B9)),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-            ),
-          ),
-
-          // Scrollable content
-          SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 24),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                _buildViewToggle(screenWidth),
-                const SizedBox(height: 16),
-                _buildGaugeChart(screenWidth),
-                const SizedBox(height: 24),
-
-                // Only show date toggle in Data View
-                if (isDataView) ...[
-                  _buildDataToggle(screenWidth),
-                  const SizedBox(height: 16),
-
-                  if (!isTodayData) ...[
-                    _buildDatePickerSection(screenWidth),
-                    const SizedBox(height: 16),
-                  ],
-
-                  _buildEnergyChart(
-                    screenWidth,
-                    isTodayData ? '5.53 kw' : '20.05 kw',
-                  ),
-
-                  if (!isTodayData) ...[
-                    const SizedBox(height: 16),
-                    _buildEnergyChart(screenWidth, '5.53 kw'),
-                  ],
-                ],
-
-                // Show Data & Cost Info in Revenue View
-                if (!isDataView) ...[
-                  const SizedBox(height: 24),
-                  _buildDataCostInfo(screenWidth),
-                ],
-
-                SizedBox(height: 400,)
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildViewToggle(double screenWidth) {
-    return Container(
+  Widget viewToggle(double screenWidth) {
+    return Obx(() => Container(
       width: screenWidth - 48,
       height: 48,
       margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -148,11 +23,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           GestureDetector(
-            onTap: () {
-              setState(() {
-                isDataView = true;
-              });
-            },
+            onTap: () => controller.toggleView(true),
             child: Row(
               children: [
                 Container(
@@ -161,7 +32,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isDataView
+                      color: controller.isDataView.value
                           ? const Color(0xFF0096FC)
                           : const Color(0xFFA5A7B9),
                     ),
@@ -172,7 +43,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
                       height: 8,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: isDataView
+                        color: controller.isDataView.value
                             ? const Color(0xFF0096FC)
                             : const Color(0xFFA5A7B9),
                       ),
@@ -185,10 +56,8 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 16,
-                    fontWeight: isDataView ? FontWeight.w600 : FontWeight.w400,
-                    color: isDataView
-                        ? const Color(0xFF646984)
-                        : const Color(0xFF646984),
+                    fontWeight: controller.isDataView.value ? FontWeight.w600 : FontWeight.w400,
+                    color: const Color(0xFF646984),
                   ),
                 ),
               ],
@@ -196,11 +65,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
           ),
           const SizedBox(width: 40),
           GestureDetector(
-            onTap: () {
-              setState(() {
-                isDataView = false;
-              });
-            },
+            onTap: () => controller.toggleView(false),
             child: Row(
               children: [
                 Container(
@@ -209,7 +74,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: !isDataView
+                      color: !controller.isDataView.value
                           ? const Color(0xFF0096FC)
                           : const Color(0xFFA5A7B9),
                     ),
@@ -220,7 +85,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
                       height: 8,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: !isDataView
+                        color: !controller.isDataView.value
                             ? const Color(0xFF0096FC)
                             : const Color(0xFFA5A7B9),
                       ),
@@ -233,8 +98,8 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 16,
-                    fontWeight: !isDataView ? FontWeight.w600 : FontWeight.w400,
-                    color: !isDataView
+                    fontWeight: !controller.isDataView.value ? FontWeight.w600 : FontWeight.w400,
+                    color: !controller.isDataView.value
                         ? const Color(0xFF0096FC)
                         : const Color(0xFF646984),
                   ),
@@ -244,42 +109,36 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
           ),
         ],
       ),
-    );
+    ));
   }
 
-  Widget _buildGaugeChart(double screenWidth) {
+  Widget gaugeChart(double screenWidth) {
     return Container(
       width: screenWidth - 48,
       margin: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: [
-          SizedBox(
+          Obx(() => SizedBox(
             width: 200,
             height: 200,
             child: CustomPaint(
-              painter: GaugePainter(
-                progress: isDataView
-                    ? (isTodayData ? 0.55 : 0.57)
-                    : 0.65,
-              ),
+              painter: GaugePainter(progress: controller.gaugeProgress),
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      isDataView
-                          ? (isTodayData ? '55.00' : '57.00')
-                          : '8897455',
+                      controller.gaugeValue,
                       style: TextStyle(
                         fontFamily: 'Inter',
-                        fontSize: isDataView ? 20 : 26,
+                        fontSize: controller.isDataView.value ? 20 : 26,
                         fontWeight: FontWeight.w500,
                         color: const Color(0xFF04063E),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      isDataView ? 'kWh/Sqft' : 'tk',
+                      controller.gaugeUnit,
                       style: const TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 16,
@@ -291,22 +150,18 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
                 ),
               ),
             ),
-          ),
+          )),
         ],
       ),
     );
   }
 
-  Widget _buildDataToggle(double screenWidth) {
-    return Row(
+  Widget dataToggle(double screenWidth) {
+    return Obx(() => Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         GestureDetector(
-          onTap: () {
-            setState(() {
-              isTodayData = true;
-            });
-          },
+          onTap: () => controller.toggleDataType(true),
           child: Row(
             children: [
               Container(
@@ -316,7 +171,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
                   shape: BoxShape.circle,
                   color: Colors.white,
                   border: Border.all(
-                    color: isTodayData
+                    color: controller.isTodayData.value
                         ? const Color(0xFF0096FC)
                         : const Color(0xFF646984),
                     width: 0.5,
@@ -328,7 +183,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
                     height: 6,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isTodayData
+                      color: controller.isTodayData.value
                           ? const Color(0xFF0096FC)
                           : const Color(0xFF646984),
                     ),
@@ -341,8 +196,8 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 14,
-                  fontWeight: isTodayData ? FontWeight.w600 : FontWeight.w400,
-                  color: isTodayData
+                  fontWeight: controller.isTodayData.value ? FontWeight.w600 : FontWeight.w400,
+                  color: controller.isTodayData.value
                       ? const Color(0xFF0096FC)
                       : const Color(0xFF646984),
                 ),
@@ -352,11 +207,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
         ),
         const SizedBox(width: 40),
         GestureDetector(
-          onTap: () {
-            setState(() {
-              isTodayData = false;
-            });
-          },
+          onTap: () => controller.toggleDataType(false),
           child: Row(
             children: [
               Container(
@@ -366,7 +217,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
                   shape: BoxShape.circle,
                   color: Colors.white,
                   border: Border.all(
-                    color: !isTodayData
+                    color: !controller.isTodayData.value
                         ? const Color(0xFF0096FC)
                         : const Color(0xFF646984),
                     width: 0.5,
@@ -378,7 +229,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
                     height: 6,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: !isTodayData
+                      color: !controller.isTodayData.value
                           ? const Color(0xFF0096FC)
                           : const Color(0xFF646984),
                     ),
@@ -391,8 +242,8 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 14,
-                  fontWeight: !isTodayData ? FontWeight.w600 : FontWeight.w400,
-                  color: !isTodayData
+                  fontWeight: !controller.isTodayData.value ? FontWeight.w600 : FontWeight.w400,
+                  color: !controller.isTodayData.value
                       ? const Color(0xFF0096FC)
                       : const Color(0xFF646984),
                 ),
@@ -401,10 +252,10 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
           ),
         ),
       ],
-    );
+    ));
   }
 
-  Widget _buildDatePickerSection(double screenWidth) {
+  Widget datePickerSection(double screenWidth, BuildContext context) {
     return Container(
       width: screenWidth - 48,
       margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -412,19 +263,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
         children: [
           Expanded(
             child: GestureDetector(
-              onTap: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: fromDate ?? DateTime.now(),
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime.now(),
-                );
-                if (date != null) {
-                  setState(() {
-                    fromDate = date;
-                  });
-                }
-              },
+              onTap: () => controller.selectFromDate(context),
               child: Container(
                 height: 35,
                 decoration: BoxDecoration(
@@ -458,19 +297,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
           const SizedBox(width: 8),
           Expanded(
             child: GestureDetector(
-              onTap: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: toDate ?? DateTime.now(),
-                  firstDate: fromDate ?? DateTime(2020),
-                  lastDate: DateTime.now(),
-                );
-                if (date != null) {
-                  setState(() {
-                    toDate = date;
-                  });
-                }
-              },
+              onTap: () => controller.selectToDate(context),
               child: Container(
                 height: 35,
                 decoration: BoxDecoration(
@@ -503,17 +330,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
           ),
           const SizedBox(width: 8),
           GestureDetector(
-            onTap: () {
-              if (fromDate != null && toDate != null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Searching from ${fromDate!.toString().split(' ')[0]} to ${toDate!.toString().split(' ')[0]}',
-                    ),
-                  ),
-                );
-              }
-            },
+            onTap: controller.searchData,
             child: Container(
               width: 34,
               height: 35,
@@ -534,10 +351,9 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
     );
   }
 
-  Widget _buildDataCostInfo(double screenWidth) {
-    return Container(
+  Widget dataCostInfo(double screenWidth) {
+    return Obx(() => Container(
       width: screenWidth - 48,
-     // margin: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: const Color(0xFFA5A7B9)),
@@ -545,13 +361,8 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
       ),
       child: Column(
         children: [
-          // Header - NO BORDER at bottom
           GestureDetector(
-            onTap: () {
-              setState(() {
-                isExpanded = !isExpanded;
-              });
-            },
+            onTap: controller.toggleExpanded,
             child: Container(
               padding: const EdgeInsets.all(8),
               child: Row(
@@ -580,7 +391,9 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      isExpanded ? Icons.keyboard_double_arrow_up : Icons.keyboard_double_arrow_down,
+                      controller.isExpanded.value
+                          ? Icons.keyboard_double_arrow_up
+                          : Icons.keyboard_double_arrow_down,
                       color: Colors.white,
                       size: 22,
                     ),
@@ -589,39 +402,33 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
               ),
             ),
           ),
-
-          // Divider line - ONLY shows when expanded
-          if (isExpanded)
+          if (controller.isExpanded.value)
             Container(
               width: double.infinity,
               height: 1,
               color: const Color(0xFFA5A7B9),
             ),
-
-          // Expandable content
-          if (isExpanded)
+          if (controller.isExpanded.value)
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 children: [
-                  _buildInfoRow('Data 1', '2798.50 (29.53%)', 'Cost 1', '35689 ৳'),
+                  infoRow('Data 1', '2798.50 (29.53%)', 'Cost 1', '35689 ৳'),
                   const SizedBox(height: 16),
-                  _buildInfoRow('Data 2', '2798.50 (29.53%)', 'Cost 2', '35689 ৳'),
+                  infoRow('Data 2', '2798.50 (29.53%)', 'Cost 2', '35689 ৳'),
                   const SizedBox(height: 16),
-                  _buildInfoRow('Data 3', '2798.50 (29.53%)', 'Cost 3', '35689 ৳'),
+                  infoRow('Data 3', '2798.50 (29.53%)', 'Cost 3', '35689 ৳'),
                   const SizedBox(height: 16),
-                  _buildInfoRow('Data 4', '2798.50 (29.53%)', 'Cost 4', '35689 ৳'),
+                  infoRow('Data 4', '2798.50 (29.53%)', 'Cost 4', '35689 ৳'),
                 ],
               ),
             ),
-
-
         ],
       ),
-    );
+    ));
   }
 
-  Widget _buildInfoRow(String dataLabel, String dataValue, String costLabel, String costValue) {
+  Widget infoRow(String dataLabel, String dataValue, String costLabel, String costValue) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -692,7 +499,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
     );
   }
 
-  Widget _buildEnergyChart(double screenWidth, String energyValue) {
+  Widget energyChart(double screenWidth, String energyValue) {
     return Container(
       width: screenWidth - 48,
       margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -728,19 +535,19 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
             ],
           ),
           const SizedBox(height: 16),
-          _buildDataRow('Data A', const Color(0xFF0096FC), '2798.50 (29.53%)', '35689 ৳'),
+          dataRow('Data A', const Color(0xFF0096FC), '2798.50 (29.53%)', '35689 ৳'),
           const SizedBox(height: 4),
-          _buildDataRow('Data B', const Color(0xFF7BD7FF), '72598.50 (35.39%)', '5259689 ৳'),
+          dataRow('Data B', const Color(0xFF7BD7FF), '72598.50 (35.39%)', '5259689 ৳'),
           const SizedBox(height: 4),
-          _buildDataRow('Data C', const Color(0xFF9747FF), '6598.36 (83.90%)', '5698756 ৳'),
+          dataRow('Data C', const Color(0xFF9747FF), '6598.36 (83.90%)', '5698756 ৳'),
           const SizedBox(height: 4),
-          _buildDataRow('Data D', const Color(0xFFFF9A00), '6598.26 (36.59%)', '356987 ৳'),
+          dataRow('Data D', const Color(0xFFFF9A00), '6598.26 (36.59%)', '356987 ৳'),
         ],
       ),
     );
   }
 
-  Widget _buildDataRow(String label, Color color, String data, String cost) {
+  Widget dataRow(String label, Color color, String data, String cost) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -781,17 +588,47 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
               children: [
                 Row(
                   children: [
-                    const Text('Data', style: TextStyle(fontFamily: 'Inter', fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xFF646984))),
-                    const Text(' : ', style: TextStyle(fontFamily: 'Inter', fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF646984))),
-                    Text(data, style: const TextStyle(fontFamily: 'Inter', fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF04063E))),
+                    const Text('Data',
+                        style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFF646984))),
+                    const Text(' : ',
+                        style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF646984))),
+                    Text(data,
+                        style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF04063E))),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Text('Cost', style: TextStyle(fontFamily: 'Inter', fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xFF646984))),
-                    const Text(' : ', style: TextStyle(fontFamily: 'Inter', fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF646984))),
-                    Text(cost, style: const TextStyle(fontFamily: 'Inter', fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF04063E))),
+                    const Text('Cost',
+                        style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFF646984))),
+                    const Text(' : ',
+                        style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF646984))),
+                    Text(cost,
+                        style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF04063E))),
                   ],
                 ),
               ],
@@ -803,6 +640,7 @@ class _EnergyDashboardState extends State<EnergyDashboard> {
   }
 }
 
+// Gauge Painter Widget
 class GaugePainter extends CustomPainter {
   final double progress;
 
@@ -813,7 +651,6 @@ class GaugePainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
 
-    // Background arc (light blue)
     final backgroundPaint = Paint()
       ..color = const Color(0xFF55B4FF).withOpacity(0.15)
       ..style = PaintingStyle.stroke
@@ -828,7 +665,6 @@ class GaugePainter extends CustomPainter {
       backgroundPaint,
     );
 
-    // Progress arc (blue)
     final progressPaint = Paint()
       ..color = const Color(0xFF4E91FD)
       ..style = PaintingStyle.stroke

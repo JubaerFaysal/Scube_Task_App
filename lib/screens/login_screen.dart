@@ -1,27 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:scube_task_app/screens/dashboard_screen.dart';
-
+import '../controllers/login_controller.dart';
 import '../widgets/custom_text_field.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class LoginScreen extends StatelessWidget {
+  LoginScreen({super.key});
 
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  bool obscurePassword = true;
-  final TextEditingController userName = TextEditingController();
-  final TextEditingController password = TextEditingController();
-
-  @override
-  void dispose() {
-    userName.dispose();
-    password.dispose();
-    super.dispose();
-  }
+  final controller = Get.put(LoginController());
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     double widthScale = screenWidth / 360;
     double heightScale = screenHeight / 800;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0096FC),
       body: Stack(
@@ -59,8 +46,8 @@ class _LoginScreenState extends State<LoginScreen> {
             right: 0,
             child: Center(
               child: Container(
-                width: 96* widthScale,
-                height: 98*heightScale,
+                width: 96 * widthScale,
+                height: 98 * heightScale,
                 decoration: const BoxDecoration(shape: BoxShape.circle),
                 child: Image.asset("assets/img.png", fit: BoxFit.cover),
               ),
@@ -79,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextSpan(
                     text: "SCUBE\n",
                     style: GoogleFonts.inter(
-                      fontSize: 24*widthScale,
+                      fontSize: 24 * widthScale,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                       height: 1.0,
@@ -88,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextSpan(
                     text: "Control & Monitoring System",
                     style: GoogleFonts.inter(
-                      fontSize: 20*widthScale,
+                      fontSize: 20 * widthScale,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                       height: 28 / 20,
@@ -110,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: GoogleFonts.inter(
                   fontStyle: FontStyle.normal,
                   fontWeight: FontWeight.w700,
-                  fontSize: 24*widthScale,
+                  fontSize: 24 * widthScale,
                   height: 1.5,
                   letterSpacing: 0,
                   color: Color(0xFF082438),
@@ -126,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
             top: screenHeight * (428 / 800),
             child: Container(
               width: screenWidth,
-              height: 56*heightScale,
+              height: 56 * heightScale,
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(color: const Color(0xFFB9C6D6), width: 1),
@@ -134,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: CustomTextField(
                 hintText: "Username",
-                controller: userName,
+                controller: controller.userNameController,
               ),
             ),
           ),
@@ -146,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
             top: screenHeight * (496 / 800),
             child: Container(
               width: screenWidth,
-              height: 56*heightScale,
+              height: 56 * heightScale,
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(color: const Color(0xFFB9C6D6), width: 1),
@@ -154,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: CustomTextField(
                 hintText: "Password",
-                controller: password,
+                controller: controller.passwordController,
                 isPassword: true,
               ),
             ),
@@ -165,14 +152,14 @@ class _LoginScreenState extends State<LoginScreen> {
             right: 12,
             top: screenHeight * (560 / 800),
             child: GestureDetector(
-              onTap: () {},
-              child:  Text(
+              onTap: controller.forgotPassword,
+              child: Text(
                 'Forget password?',
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontStyle: FontStyle.normal,
                   fontWeight: FontWeight.w500,
-                  fontSize: 12* widthScale,
+                  fontSize: 12 * widthScale,
                   height: 15 / 12,
                   decoration: TextDecoration.underline,
                   color: Color(0xFF5E5E5E),
@@ -187,27 +174,22 @@ class _LoginScreenState extends State<LoginScreen> {
             top: screenHeight * (595 / 800),
             right: 12,
             child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => DashboardScreen()),
-                );
-              },
+              onTap: controller.login,
               child: Container(
                 width: screenWidth,
-                height: 60*heightScale,
+                height: 60 * heightScale,
                 decoration: BoxDecoration(
                   color: const Color(0xFF0096FC),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child:  Center(
+                child: Center(
                   child: Text(
                     'Login',
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontStyle: FontStyle.normal,
                       fontWeight: FontWeight.w600,
-                      fontSize: 18*widthScale,
+                      fontSize: 18 * widthScale,
                       height: 22 / 18,
                       color: Colors.white,
                     ),
@@ -231,22 +213,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: GoogleFonts.inter(
                       fontStyle: FontStyle.normal,
                       fontWeight: FontWeight.w500,
-                      fontSize: 12*widthScale,
+                      fontSize: 12 * widthScale,
                       height: 15 / 12,
                       color: const Color(0xFF5E5E5E),
                     ),
                   ),
                   WidgetSpan(
                     child: GestureDetector(
-                      onTap: () {
-                        // Handle register navigation
-                      },
+                      onTap: controller.register,
                       child: Text(
                         'Register Now',
                         style: GoogleFonts.inter(
                           fontStyle: FontStyle.normal,
                           fontWeight: FontWeight.w600,
-                          fontSize: 14*widthScale,
+                          fontSize: 14 * widthScale,
                           height: 15 / 12,
                           color: const Color(0xFF0096FC),
                         ),

@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:scube_task_app/controllers/dashboard_controller.dart';
+import 'package:scube_task_app/screens/dashboard_screen/widgets/dashboard_widgets.dart';
 
-class EmptyScreen extends StatelessWidget {
-  const EmptyScreen({super.key});
+class DashboardScreen extends StatelessWidget {
+  DashboardScreen({super.key});
+
+  final controller = Get.put(DashboardController());
+  late final widgets = DashboardWidgets(controller);
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    double widthScale = screenWidth / 360;
+    double heightScale = screenHeight / 836;
+
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4F1),
       appBar: AppBar(
@@ -41,29 +52,23 @@ class EmptyScreen extends StatelessWidget {
             ],
           ),
         ],
-      ),      body: Container(
-        padding: const EdgeInsets.all(24),
-        margin: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFB6B8D0)),
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
-          color: Colors.white,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const SizedBox(height: 30),
-            Image.asset('assets/empty.png'),
-            const Text(
-              'No data is here,',
-              style: TextStyle(color: Color(0xFF5E5E5E)),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(height: 12 * heightScale),
+                  widgets.mainCard(screenWidth, screenHeight, widthScale, heightScale),
+                  SizedBox(height: 20 * heightScale),
+                  widgets.buildBottomGrid(screenWidth, widthScale),
+                  SizedBox(height: 20 * heightScale),
+                ],
+              ),
             ),
-            const Text(
-              'please wait.',
-              style: TextStyle(color: Color(0xFF5E5E5E)),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
